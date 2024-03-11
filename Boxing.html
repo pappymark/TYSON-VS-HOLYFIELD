@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		#log {
+			padding: 5px;
+			color: white;
+			background: rgb(167, 0, 0);
+			text-align: center;
+			max-width: 100px;
+			box-shadow: 0px 0px 10px #020202;
+		}
+
+		body {
+			text-align: center;
+
+		}
+
+		#boxingRing {
+			background: url(/mainEvent.PNG);
+			background-size: cover;
+			
+		}
+
+		#hpContainer {
+			display: flex;
+			justify-content: center;
+			gap: 30px;
+		}
+
+		#logContainer {
+			display: flex;
+			justify-content: center;
+
+		}
+
+		#hpContainer {
+			height: 70px;
+			background-color: rgb(255, 255, 255);
+		}
+		#hpContainer p {
+			font-family: sans-serif;
+			font-size: 18px;
+			font-weight: 1000;
+			color: rgb(255, 0, 0);
+			text-shadow: 0px 0px 0px 0.5 #333333;
+		}
+
+		#fightBtn {
+			background: blue;
+			border-radius: 20px;
+			color: white;
+		}
+
+
+	</style>
+	<title>tyson vs holyfield</title>
+</head>
+
+<body>
+
+	<div id="boxingRing">
+
+		<div id="hpContainer" >
+		<p>TYSON - HP: <span id="tysonHP">100</span></p>
+		<p>HOLYFIELD - HP: <span id="holyfieldHP">100</span></p>
+		</div>
+		<br>
+		<br>
+		<div id="logContainer" >
+		<div id="log"></div>
+		<br>
+		</div>
+		<br>
+		<button id="fightBtn">Begin Fight</button>
+	</div>
+
+	<script>
+		let tysonHP = 100; // tyson starts with 100 HP
+		let holyfieldHP = 100; // holyfield starts with 100 HP
+		const attackDamage = 10; // Attack deals 10 damage
+
+		// Function to update HP display
+		function updateHP() {
+			document.getElementById("tysonHP").textContent = tysonHP;
+			document.getElementById("holyfieldHP").textContent = holyfieldHP;
+		}
+		// ------NEW LOG FUNCTION MODIFIED------------------
+		function addLog(message, imagePath) {
+			const logContainer = document.getElementById("log");
+			// Clear previous logs
+			logContainer.innerHTML = "";
+			const logEntry = document.createElement("div");
+			const image = document.createElement("img");
+			image.src = imagePath;
+			image.style.width = "100px"; // Set the width of the image
+			logEntry.appendChild(image);
+			logEntry.appendChild(document.createTextNode(message));
+			logContainer.appendChild(logEntry);
+		}
+		//----------  OLD LOG FUNCTION --------------------
+		// // Function to add log message
+		// function addLog(message) {
+		//     document.getElementById("log").textContent = message + "\n";
+		// }
+		//------------------------------------------------------------------------
+
+		// Function to handle the attack
+		async function attack() {
+			let tysonCanAttack = true;
+			let holyfieldCanAttack = true;
+
+			// Main game loop
+			while (tysonHP > 0 && holyfieldHP > 0) {
+				// Rock-Paper-Scissors logic
+				const tysonChoice = Math.floor(Math.random() * 3); // Random number between 0 and 2 for monster
+				const holyfieldChoice = Math.floor(Math.random() * 3); // Random number between 0 and 2 for player
+
+				// Determine the winner based on choices
+				if ((holyfieldChoice === 0 && tysonChoice === 2) ||
+					(holyfieldChoice === 1 && tysonChoice === 0) ||
+					(holyfieldChoice === 2 && tysonChoice === 1)) {
+					// holyfield wins, tyson takes damage and can't attack next round
+					tysonHP -= attackDamage;
+					updateHP();
+					addLog("tyson taking damage", "tisonTakeDmg.PNG");
+					tysonCanAttack = false;
+				} else if (holyfieldChoice !== tysonChoice) {
+					// tyson wins, holyfield takes damage and can't attack next round
+					holyfieldHP -= attackDamage;
+					updateHP();
+					addLog("holyfield taking damage", "holyTakeDmg.PNG");
+					holyfieldCanAttack = false;
+				} else {
+					// It's a tie, both block attacks
+					addLog("Clinching", "clinching.PNG");
+				}
+
+				// Check if someone won
+				if (tysonHP <= 0) {
+					addLog("holyfield wins!", "holyWin.PNG");
+					break;
+				} else if (holyfieldHP <= 0) {
+					addLog("tyson wins!", "tysonWin.PNG");
+					break;
+				}
+
+				// Wait for a short delay before the next round
+				await new Promise(resolve => setTimeout(resolve, 1000));
+
+				// Reset attack flags for the next round
+				tysonCanAttack = true;
+				holyfieldCanAttack = true;
+			}
+		}
+
+		// Add event listener to the "Begin Fight" button
+		document.getElementById("fightBtn").addEventListener("click", function () {
+			// Clear previous logs
+			document.getElementById("log").textContent = "";
+
+			// Start the fight
+			attack();
+		});
+	</script>
+</body>
+
+</html>
